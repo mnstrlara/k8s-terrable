@@ -8,8 +8,8 @@ terraform {
 }
 
 resource "virtualbox_vm" "node" {
-  count     = 1
-  name      = format("node-%02d", count.index + 1)
+  count     = 2
+  name      = format("node-%02d-%s", count.index + 1, random_id.vm_id[count.index].hex)
   image     = var.vm_image
   cpus      = 2
   memory    = "1024 mib"
@@ -18,6 +18,9 @@ resource "virtualbox_vm" "node" {
     type           = "hostonly"
     host_interface = "vboxnet0"  
   }
+}
 
-  boot_order = ["disk", "none", "none", "none"]
+resource "random_id" "vm_id" {
+  count       = 2
+  byte_length = 4
 }
