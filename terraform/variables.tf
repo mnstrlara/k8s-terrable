@@ -3,3 +3,13 @@ variable "vm_image" {
   type        = string
   sensitive   = true
 }
+variable "ssh_key_source" {
+  description = "The source path of the SSH public key"
+  type        = string
+  sensitive   = true
+}
+variable "ssh_private_key_path" {
+  description = "The path to the SSH private key file"
+  type        = string
+  sensitive   = true
+}
