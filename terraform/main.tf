@@ -24,22 +24,23 @@ resource "virtualbox_vm" "node" {
   # Add provisioner to inject SSH key
   provisioner "file" {
     source      = var.ssh_key_source
-    destination = "/home/ubuntu/.ssh/authorized_keys"
+    destination = "/tmp/authorized_keys"
   }
-
   provisioner "remote-exec" {
     inline = [
-      "sudo mv /home/ubuntu/.ssh/authorized_keys /etc/home/ubuntu/.ssh/authorized_keys",
-      "sudo hostnamectl set-hostname ${format("node-%02d", count.index + 1)}",
-      "sudo netplan apply",
-      "ip a s"
+      "mkdir -p /home/vagrant/.ssh",
+      "echo '${file(var.ssh_key_source)}' > /home/vagrant/.ssh/authorized_keys",
+      "chmod 700 /home/vagrant/.ssh",
+      "chmod 600 /home/vagrant/.ssh/authorized_keys",
+      "chown -R vagrant:vagrant /home/vagrant/.ssh",
+      "sed -i '/vagrant insecure public key/d' /home/vagrant/.ssh/authorized_keys"
     ]
   }
 
   connection {
     type        = "ssh"
-    user        = "ubuntu"
-    private_key = file(var.ssh_private_key_path)
+    user        = "vagrant"
+    private_key = file("~/.vagrant.d/insecure_private_key")
     host        = self.network_adapter[0].ipv4_address
   }
 }
