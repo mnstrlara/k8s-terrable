@@ -3,10 +3,10 @@ all:
     nodes:
       hosts:
         node-01:
-          ansible_host: 192.168.56.175
+          ansible_host: 192.168.56.177
           ansible_user: vagrant
           ansible_ssh_private_key_file: "{{ ssh_private_key_path }}"
         node-02:
-          ansible_host: 192.168.56.176
+          ansible_host: 192.168.56.178
           ansible_user: vagrant
           ansible_ssh_private_key_file: "{{ ssh_private_key_path }}"
