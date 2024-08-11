@@ -15,8 +15,8 @@ resource "virtualbox_vm" "node" {
   memory = "1024 mib"
 
   network_adapter {
-    type           = "hostonly"
-    host_interface = "vboxnet0"
+    type = "bridged"
+    host_interface = var.network_adapter
   }
 
   boot_order = ["disk", "none", "none", "none"]
