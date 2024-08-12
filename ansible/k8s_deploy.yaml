@@ -1,0 +1,90 @@
+---
+- hosts: nodes
+  become: true
+
+  vars:
+    kind_version: "v0.20.0"
+    kubectl_version: "v1.27.3"
+
+  tasks:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+      register: apt_update_result
+      ignore_errors: yes
+
+    - name: Display apt update result
+      debug:
+        var: apt_update_result
+        
+    - name: Install required packages
+      apt:
+        name:
+          - apt-transport-https
+          - ca-certificates
+          - curl
+          - gnupg-agent
+          - software-properties-common
+        state: present
+        update_cache: yes
+
+    - name: Add Docker GPG key
+      apt_key:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        state: present
+
+    - name: Add Docker repository
+      apt_repository:
+        repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable
+        state: present
+
+    - name: Install Docker
+      apt:
+        name:
+          - docker-ce
+          - docker-ce-cli
+          - containerd.io
+        state: present
+        update_cache: yes
+
+    - name: Add user to docker group
+      user:
+        name: "{{ ansible_user }}"
+        groups: docker
+        append: yes
+
+    - name: Restart SSH connection to apply group changes
+      meta: reset_connection
+
+    - name: Restart Docker service
+      systemd:
+        name: docker
+        state: restarted
+
+    - name: Wait for Docker to be available
+      wait_for:
+        path: /var/run/docker.sock
+        state: present
+        timeout: 60
+
+    - name: Install KinD
+      get_url:
+        url: https://github.com/kubernetes-sigs/kind/releases/download/{{ kind_version }}/kind-linux-amd64
+        dest: /usr/local/bin/kind
+        mode: '0755'
+
+    - name: Install kubectl
+      get_url:
+        url: https://storage.googleapis.com/kubernetes-release/release/{{ kubectl_version }}/bin/linux/amd64/kubectl
+        dest: /usr/local/bin/kubectl
+        mode: '0755'
+
+    - name: Create Kubernetes cluster
+      command: kind create cluster
+      register: kind_cluster
+      become: true
+      become_user: "{{ ansible_user }}"
+
+    - name: Display KinD cluster info
+      debug:
+        var: kind_cluster.stdout_lines

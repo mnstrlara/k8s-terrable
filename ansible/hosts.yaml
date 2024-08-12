@@ -3,10 +3,10 @@ all:
     nodes:
       hosts:
         node-01:
-          ansible_host: 192.168.56.177
+          ansible_host: # Add ID of the VM received from the terraform output
           ansible_user: vagrant
           ansible_ssh_private_key_file: "{{ ssh_private_key_path }}"
         node-02:
-          ansible_host: 192.168.56.178
+          ansible_host: # Add ID of the VM received from the terraform output
           ansible_user: vagrant
           ansible_ssh_private_key_file: "{{ ssh_private_key_path }}"

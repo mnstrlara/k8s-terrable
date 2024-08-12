@@ -1,1 +1,14 @@
 ssh_private_key_path: "~/.ssh/k8s-terrable"
+kind_version: "v0.20.0"
+kubectl_version: "v1.27.3"
+ansible_user: "vagrant"
+docker_packages:
+  - docker-ce
+  - docker-ce-cli
+  - containerd.io
+required_packages:
+  - apt-transport-https
+  - ca-certificates
+  - curl
+  - gnupg-agent
+  - software-properties-common
